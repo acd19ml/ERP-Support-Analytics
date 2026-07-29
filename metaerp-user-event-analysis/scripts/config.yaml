@@ -1,0 +1,56 @@
+# MetaERP 工单分类 v3 集中配置
+# 修改判据 → 改 references/spec.md；修改运行参数/列名 → 改本文件
+
+llm:
+  # 凭证从 .env 读取：LLM_BASE_URL / LLM_MODEL / ANTHROPIC_AUTH_TOKEN
+  # 网关为 Anthropic Messages API 格式；内网直连（trust_env=False，不走系统代理）
+  temperature: 0          # 效果优先：固定 0，保证可复现，一致性检查依赖此设置
+  max_tokens: 600         # 单条输出：依据一句话 + 分类 JSON，600 足够
+  stream: true            # 流式读取，规避网关长连接超时
+  timeout: 120
+
+run:
+  concurrency: 8          # 并发线程数；网关限流报 429/5xx 时下调
+  tickets_per_call: 1     # 【设计约束】每次调用只判一条，避免批内交叉污染；除非网关吞吐严重受限，不要改
+  max_retries: 3          # 单条失败自动重试次数（指数退避）
+  results_file: results.jsonl   # 断点续跑账本，位于 --results-dir 下
+
+excel:
+  # 列名自动探测候选（按序匹配第一个存在的列）；探测失败时在此显式指定 name_override
+  columns:
+    ticket_id:
+      candidates: ["工单号", "事件编号", "单号", "事件单号"]
+      name_override: null
+    title:
+      candidates: ["标题", "事件标题", "工单标题"]
+      name_override: null
+    description:
+      candidates: ["问题描述", "事件描述", "描述"]
+      name_override: null
+    solution:
+      candidates: ["解决方案", "处理方案", "处理过程", "解决过程"]
+      name_override: null
+  # 写回的新增列名（与用户确认后修改）
+  out_columns:
+    topic: "专题"
+    l1: "L1问题表象"
+    l2: "L2细分"
+    solution_class: "解决方案分类"
+    rationale: "分类依据"
+    boundary: "边界工单"     # 写入 是/空，用于筛选定向人工复核
+
+eval:
+  # 金标（人工审核）列名——用于 eval.py 对比；按你 6 月审核文件的实际列名修改
+  gold_columns:
+    topic: "专题-人工"
+    l1: "L1-人工"
+    l2: "L2-人工"
+    solution_class: "解决方案-人工"
+
+sankey:
+  left: 200
+  right: 560
+  node_width: 20
+  font_size_node: 18
+  font_size_title: 26
+  # 流向：专题 → L1 → 解决方案；IT/外部类五专题无 L1/解决方案，直接作为端点
