@@ -1,0 +1,151 @@
+{
+  "schema_version": "1.0",
+  "conversation_id": "cli-demo",
+  "status": "DIAGNOSED",
+  "understanding": {
+    "schema_version": "1.0",
+    "local_capability_id": "cap-poc-rts-search-revenue-query",
+    "page_route": "hcc_rts_server/searchRevenue",
+    "resource_type": "REVENUE_TRIGGER_ENTRY",
+    "requested_action": "QUERY",
+    "symptom": "NO_DATA",
+    "target_bg": "EBG",
+    "target_dimension": {
+      "dimension_type": "REP_OFFICE",
+      "dimension_code": "rep-poc-jiangsu-cn",
+      "dimension_name": "Jiangsu Rep Office, CN",
+      "bg": "EBG"
+    },
+    "user_hypothesis": null,
+    "missing_fields": [],
+    "ambiguities": [],
+    "evidence": [
+      {
+        "kind": "FUNCTION_MATCH",
+        "value": "hcc_rts_server/searchRevenue"
+      },
+      {
+        "kind": "ACTION_TEXT",
+        "value": "QUERY"
+      },
+      {
+        "kind": "BG_TEXT",
+        "value": "EBG"
+      },
+      {
+        "kind": "DIMENSION_ALIAS",
+        "value": "江苏代表处"
+      }
+    ],
+    "metadata": {
+      "prompt_version": "nlu-v1",
+      "provider": "rule-based"
+    }
+  },
+  "diagnosis": {
+    "schema_version": "1.0",
+    "decision": "DENY",
+    "cause_code": "MISSING_DATA_SCOPE",
+    "confidence_mode": "DETERMINISTIC",
+    "policy_id": "pol-poc-rts-ebg-query-001",
+    "policy_version": "1.0.0",
+    "entitlement_snapshot_id": "snap-u_poc_missing_scope",
+    "checks": [
+      {
+        "check_id": "CHECK_DATA_FRESHNESS",
+        "result": "PASS",
+        "evidence": [
+          "2026-07-31T08:15:00+08:00"
+        ]
+      },
+      {
+        "check_id": "CHECK_POLICY_STATUS",
+        "result": "PASS",
+        "evidence": [
+          "POC_APPROVED"
+        ]
+      },
+      {
+        "check_id": "CHECK_REQUIRED_ROLE",
+        "result": "PASS",
+        "evidence": [
+          "role-poc-rts-ebg-monitor"
+        ]
+      },
+      {
+        "check_id": "CHECK_ROLE_VALIDITY",
+        "result": "PASS",
+        "evidence": [
+          "role-poc-rts-ebg-monitor"
+        ]
+      },
+      {
+        "check_id": "CHECK_ROLE_INSTANCE_SCOPE_COVERAGE",
+        "result": "FAIL",
+        "evidence": [
+          "rep-poc-jiangsu-cn"
+        ]
+      }
+    ],
+    "recommended_action": {
+      "action_code": "APPLY_DATA_SCOPE",
+      "role_id": "role-poc-rts-ebg-monitor",
+      "role_name": "EISDP_Monitor RTS 业务监控人员RTS",
+      "dimension_type": "REP_OFFICE",
+      "dimension_code": "rep-poc-jiangsu-cn",
+      "dimension_name": "Jiangsu Rep Office, CN",
+      "application_entry": "https://w3.huawei.com/iauth/#/selectPrivilege?onlyRole=true",
+      "wait_minutes": null,
+      "metadata": {}
+    },
+    "mandatory_escalation": false,
+    "escalation_reason": null,
+    "metadata": {}
+  },
+  "response_text": "您已具备 RTS EBG 查询角色，但该角色实例下未包含“Jiangsu Rep Office, CN”代表处数据范围。请在 iAuth 为角色“EISDP_Monitor RTS 业务监控人员RTS”补充该代表处数据权限：https://w3.huawei.com/iauth/#/selectPrivilege?onlyRole=true。",
+  "trace": [
+    {
+      "step": 1,
+      "action": "UNDERSTAND_REQUEST",
+      "output": "cap-poc-rts-search-revenue-query",
+      "evidence": [
+        "FUNCTION_MATCH:hcc_rts_server/searchRevenue",
+        "ACTION_TEXT:QUERY",
+        "BG_TEXT:EBG",
+        "DIMENSION_ALIAS:江苏代表处"
+      ]
+    },
+    {
+      "step": 2,
+      "action": "LOAD_POLICY",
+      "output": "pol-poc-rts-ebg-query-001",
+      "evidence": [
+        "1.0.0"
+      ]
+    },
+    {
+      "step": 3,
+      "action": "GET_ENTITLEMENTS",
+      "output": "snap-u_poc_missing_scope",
+      "evidence": [
+        "2026-07-31T08:15:00+08:00"
+      ]
+    },
+    {
+      "step": 4,
+      "action": "DETERMINISTIC_DIAGNOSIS",
+      "output": "MISSING_DATA_SCOPE",
+      "evidence": [
+        "CHECK_DATA_FRESHNESS:PASS",
+        "CHECK_POLICY_STATUS:PASS",
+        "CHECK_REQUIRED_ROLE:PASS",
+        "CHECK_ROLE_VALIDITY:PASS",
+        "CHECK_ROLE_INSTANCE_SCOPE_COVERAGE:FAIL"
+      ]
+    }
+  ],
+  "metadata": {
+    "policy_version": "1.0.0",
+    "entitlement_data_freshness": "2026-07-31T08:15:00+08:00"
+  }
+}
